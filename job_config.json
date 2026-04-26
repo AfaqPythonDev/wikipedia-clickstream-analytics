@@ -1,47 +1,47 @@
-import json
-
-job_config = {
-    "name": "Wikipedia Analytics Pipeline",
-    "job_id": "442700653977801",
-    "schedule": {
-        "quartz_cron_expression": "0 0 2 * * ?",
-        "timezone_id": "UTC",
-        "pause_status": "UNPAUSED"
+{
+  "name": "Wikipedia Analytics Pipeline",
+  "job_id": "442700653977801",
+  "schedule": {
+    "quartz_cron_expression": "0 0 2 * * ?",
+    "timezone_id": "Asia/Karachi",
+    "pause_status": "UNPAUSED"
+  },
+  "tasks": [
+    {
+      "task_key": "bronze_ingestion",
+      "notebook_task": {
+        "notebook_path": "/Workspace/Users/13932@cityuniversity.edu.pk/01_bronze_ingestion"
+      },
+      "max_retries": 2
     },
-    "tasks": [
-        {
-            "task_key": "bronze_ingestion",
-            "notebook_task": {
-                "notebook_path": "/Workspace/Users/13932@cityuniversity.edu.pk/01_bronze_ingestion"
-            },
-            "max_retries": 2
-        },
-        {
-            "task_key": "silver_cleaning",
-            "depends_on": [{"task_key": "bronze_ingestion"}],
-            "notebook_task": {
-                "notebook_path": "/Workspace/Users/13932@cityuniversity.edu.pk/02_silver_cleaning"
-            },
-            "max_retries": 2
-        },
-        {
-            "task_key": "gold_analytics",
-            "depends_on": [{"task_key": "silver_cleaning"}],
-            "notebook_task": {
-                "notebook_path": "/Workspace/Users/13932@cityuniversity.edu.pk/03_gold_analytics"
-            },
-            "max_retries": 2
-        }
-    ],
-    "email_notifications": {
-        "on_failure": ["13932@cityuniversity.edu.pk"],
-        "on_success": ["13932@cityuniversity.edu.pk"]
+    {
+      "task_key": "silver_cleaning",
+      "depends_on": [{"task_key": "bronze_ingestion"}],
+      "notebook_task": {
+        "notebook_path": "/Workspace/Users/13932@cityuniversity.edu.pk/02_silver_cleaning"
+      },
+      "max_retries": 2
     },
-    "max_concurrent_runs": 1
+    {
+      "task_key": "gold_analytics",
+      "depends_on": [{"task_key": "silver_cleaning"}],
+      "notebook_task": {
+        "notebook_path": "/Workspace/Users/13932@cityuniversity.edu.pk/03_gold_analytics"
+      },
+      "max_retries": 2
+    },
+    {
+      "task_key": "dashboard_refresh",
+      "depends_on": [{"task_key": "gold_analytics"}],
+      "notebook_task": {
+        "notebook_path": "/Workspace/Users/13932@cityuniversity.edu.pk/04_dashboard_refresh"
+      },
+      "max_retries": 2
+    }
+  ],
+  "email_notifications": {
+    "on_failure": ["13932@cityuniversity.edu.pk"],
+    "on_success": ["13932@cityuniversity.edu.pk"]
+  },
+  "max_concurrent_runs": 1
 }
-
-with open("/tmp/job_config.json", "w") as f:
-    json.dump(job_config, f, indent=2)
-
-print(json.dumps(job_config, indent=2))
-print("✅ Job config saved!")
